@@ -1,0 +1,3 @@
+./checkpoints/pre_trained.ckpt
+./stanford-corenlp-4.4.0
+./wfdb

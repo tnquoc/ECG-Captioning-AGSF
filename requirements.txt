@@ -1,0 +1,13 @@
+cdifflib==1.2.5
+einops==0.8.0
+librosa==0.10.2.post1
+nltk==3.7
+numba==0.52.0
+numpy==1.20.0
+pandas==1.4.2
+pytorch_lightning==1.9.0
+scikit_learn==1.1.3
+scipy==1.8.0
+torch==2.3.1+cu118
+torchvision==0.18.1+cu118
+tqdm==4.64.0
