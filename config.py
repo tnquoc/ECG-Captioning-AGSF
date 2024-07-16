@@ -1,6 +1,5 @@
 USE_GPU = True
 
-AUGMENT = 'no_augment'  # augment / no_augment
 TOPIC = True
 GHOSTNET = False
 SPECTRAL = False
@@ -24,7 +23,7 @@ MODEL_CONFIG = {
 
 DATA_CONFIG = {
     "data_dir": "/absolute/path/to/physionet.org/files/challenge-2021/1.0.3/training",
-    "train_labels_csv": f"dataset/train_labels_{AUGMENT}.csv",
+    "train_labels_csv": f"dataset/train_labels.csv",
     "val_labels_csv": "dataset/val_labels.csv",
     "test_labels_csv": "dataset/test_labels.csv",
 }
