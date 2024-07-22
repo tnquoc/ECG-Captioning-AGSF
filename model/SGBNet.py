@@ -193,6 +193,72 @@ class SGBModel(nn.Module):
         return x
 
 
+class SGBModelCls(nn.Module):
+    def __init__(self, num_classes=2):
+        super(SGBModelCls, self).__init__()
+        cfgs = [
+            [
+                [32, 48, 32, 3, 2, 0, 0],
+                [32, 64, 32, 3, 1, 1, 1],
+            ],
+            [
+                [32, 96, 64, 3, 2, 1, 0],
+                [64, 128, 64, 3, 1, 1, 1],
+                [64, 160, 64, 3, 1, 0, 0],
+                [64, 192, 64, 3, 1, 1, 1],
+            ],
+            [
+                [64, 144, 96, 5, 2, 1, 0],
+                [96, 192, 96, 5, 1, 1, 1],
+                [96, 240, 96, 5, 1, 0, 0],
+                [96, 248, 96, 5, 1, 1, 1],
+            ],
+            [
+                [96, 192, 128, 3, 2, 1, 0],
+                [128, 256, 128, 3, 1, 1, 1],
+                [128, 320, 128, 3, 1, 0, 0],
+                [128, 384, 128, 3, 1, 1, 1],
+            ],
+            [
+                [128, 512, 256, 5, 2, 1, 0],
+                [256, 512, 256, 5, 1, 1, 1],
+            ],
+        ]
+        self.cfgs = cfgs
+        num_stages = len(self.cfgs)
+        in_proj_channel = self.cfgs[0][0][0]
+        out_proj_channel = self.cfgs[-1][-1][2]
+
+        self.in_proj = nn.Sequential(
+            nn.Conv1d(1, in_proj_channel, kernel_size=15, stride=2, padding=7, bias=False),
+            nn.BatchNorm1d(in_proj_channel),
+            nn.LeakyReLU(inplace=True),
+        )
+
+        layers = []
+        for i in range(num_stages):
+            for in_c, hid_c, out_c, k, s, use_se, shuffle in self.cfgs[i]:
+                layers.append(ShuffleGhostBottleneck(in_c, hid_c, out_c, k, s, use_se, shuffle))
+        self.layers = nn.Sequential(*layers)
+
+        self.mha = nn.MultiheadAttention(out_proj_channel, 8)
+        self.pool = nn.AdaptiveMaxPool1d(1)
+        self.cls_head = nn.Linear(256, num_classes)
+
+    def forward(self, x):
+        x = self.in_proj(x)
+        x = self.layers(x)
+        x = F.dropout(x, p=0.5, training=self.training)
+
+        x = x.squeeze(2).permute(2, 0, 1)
+        x, s = self.mha(x, x, x)
+        x = x.permute(1, 2, 0)
+        x = self.pool(x).squeeze(2)
+        x = self.cls_head(x)
+
+        return x
+
+
 if __name__ == '__main__':
     # in_channels, hidden_channels, out_channels, kernel_size, stride, use_se, shuffle
     cfgs = [

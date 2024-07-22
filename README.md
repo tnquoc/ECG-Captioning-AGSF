@@ -35,6 +35,7 @@ pip install -r requirements.txt
 1. Data: 
    - Set DATA_CONFIG['data_dir'] in file **config.py** by the path to the downloaded Physionet Challenge 2021 dataset.
    - To maintain optimal performance during training, please augment the data using the method described in the provided [paper](https://dl.acm.org/doi/abs/10.1145/3591569.3591621). Additionally, ensure that the **train_labels.csv** file in folder **dataset** is recreated to accurately correspond with your augmented data.
+   - Can filter and add noise to ECG signal by modifying the values of fields **FILTERED** and **ADD_NOISE** in file **config.py**
 2. Run ```python main.py``` to train model.
 3. Checkpoints are saved in folder logs/training. 
 4. Confusion matrix of each epoch is saved in file logs/results/log_val_cf.csv
@@ -56,6 +57,17 @@ pip install -r requirements.txt
 | BLEU1 | BLEU2 | BLEU3 | BLEU4 | ROUGE | CIDER | SE_Mean | P+_Mean | F1_Mean |
 |:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-------:|:-------:|:-------:|
 | 0.88  | 0.87  | 0.81  | 0.79  | 0.88  | 8.35  |  0.834  |  0.84   |  0.835  |
+
+## Classify Sinus/Afib rhythm in MIT datasets
+
+1. Download and process datasets:
+   - Sinus: https://www.physionet.org/content/nsrdb/1.0.0/
+   - Afib: https://physionet.org/content/afdb/1.0.0/
+   - Preprocess downloaded datasets and place in one folder
+2. Train & Test model for classification task:
+   - Modify paths to preprocessed datasets in file **ghostnet_cls.py**
+   - Run ```python ghostet_cls.py``` to train and test model
+   - The checkpoints and inference results are saved in folder **logs/ghostnet**
 
 ## References
 

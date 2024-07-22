@@ -30,7 +30,7 @@ class Vocabulary(object):
     def __len__(self):
         return len(self.word2idx)
 
-    def decode(self, word_idxs, listfy=False, join_words=True, skip_first=True, take_main_events=True):
+    def decode(self, word_idxs, listfy=False, join_words=True, skip_first=True):
         if isinstance(word_idxs, list) and len(word_idxs) == 0:
             return self.decode([word_idxs, ], join_words)[0]
         if isinstance(word_idxs, list) and isinstance(word_idxs[0], int):
@@ -50,9 +50,7 @@ class Vocabulary(object):
                 if word == '<end>':
                     break
                 caption.append(word)
-            if take_main_events:
-                caption = np.array(caption)
-                caption = caption[np.isin(caption, np.array(LIST_MAIN_WORDS))]
+
             if join_words:
                 caption = ' '.join(caption)
             if listfy:

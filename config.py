@@ -5,6 +5,9 @@ GHOSTNET = False
 SPECTRAL = False
 FNET = False
 
+FILTERED = False
+ADD_NOISE = 15
+
 MODEL_CONFIG = {
     "in_length": 2500,
     "in_channels": 1,
@@ -34,7 +37,7 @@ HYPER_PARAMETERS_CONFIG = {
     "epochs": 60,
 }
 
-CHECKPOINT_LOCATION = 'checkpoints/pre_trained.ckpt'
+CHECKPOINT_LOCATION = 'checkpoints/paper_topic10.ckpt'
 
 LIST_MAIN_WORDS = ['atrial', 'fibrillation/flutter', '2nd', 'degree', 'av', 'block', '3rd',
                    'sinus', 'rhythm', 'svt', 'vt', 'tachycardia', 'bradycardia', 'at', 'unk', 'bpm', 'with',

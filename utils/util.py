@@ -1,6 +1,7 @@
+import numpy as np
 import torch
 import torch.nn.functional as F
-
+from scipy.signal import butter, filtfilt
 
 def get_next_word(logits, temp=None, k=None, p=None, greedy=None, m=None):
     probs = F.softmax(logits, dim=-1)
@@ -23,7 +24,7 @@ def get_next_word(logits, temp=None, k=None, p=None, greedy=None, m=None):
         samp_probs[indices_to_remove] = 0
         if m is not None:
             samp_probs.div_(samp_probs.sum(1).unsqueeze(1))
-            samp_probs.mul_(1-m)
+            samp_probs.mul_(1 - m)
             samp_probs.add_(probs.mul(m))
         next_tokens = samp_probs.multinomial(1)
         next_logprobs = samp_probs.gather(1, next_tokens.view(-1, 1)).log()
@@ -38,7 +39,7 @@ def get_next_word(logits, temp=None, k=None, p=None, greedy=None, m=None):
         sorted_samp_probs[sorted_indices_to_remove] = 0
         if m is not None:
             sorted_samp_probs.div_(sorted_samp_probs.sum(1).unsqueeze(1))
-            sorted_samp_probs.mul_(1-m)
+            sorted_samp_probs.mul_(1 - m)
             sorted_samp_probs.add_(sorted_probs.mul(m))
         sorted_next_indices = sorted_samp_probs.multinomial(1).view(-1, 1)
         next_tokens = sorted_indices.gather(1, sorted_next_indices)
@@ -47,8 +48,30 @@ def get_next_word(logits, temp=None, k=None, p=None, greedy=None, m=None):
     else:
         if m is not None:
             samp_probs.div_(samp_probs.sum(1).unsqueeze(1))
-            samp_probs.mul_(1-m)
+            samp_probs.mul_(1 - m)
             samp_probs.add_(probs.mul(m))
         next_tokens = samp_probs.multinomial(1)
         next_logprobs = samp_probs.gather(1, next_tokens.view(-1, 1)).log()
     return next_tokens.squeeze(1), next_logprobs
+
+
+def add_noise(signal, snr):
+    power_signal = np.mean(signal ** 2)
+    power_noise = power_signal / (10 ** (snr / 10))
+    amplitude_noise = np.sqrt(power_noise)
+    noise = np.random.normal(loc=0, scale=amplitude_noise, size=len(signal))
+    return signal + noise
+
+
+def butter_bandpass(lowcut, highcut, fs, order=5):
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    b, a = butter(order, [low, high], btype='band')
+    return b, a
+
+
+def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    y = filtfilt(b, a, data)
+    return y

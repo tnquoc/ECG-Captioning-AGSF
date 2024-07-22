@@ -15,6 +15,7 @@ from utils.transforms import ToTensor
 import numpy as np
 import pandas as pd
 import wfdb
+from utils.util import add_noise, butter_bandpass_filter
 
 from vocab import Vocabulary
 from wfdb.processing import resample_sig
@@ -127,6 +128,12 @@ class ECGDataset(Dataset):
             waveform = np.pad(waveform, (0, 2500 - len(waveform)))
         elif len(waveform) > 2500:
             waveform = waveform[:2500]
+
+        if FILTERED:
+            waveform = butter_bandpass_filter(waveform, 0.1, 40, 250)
+
+        if ADD_NOISE is not None:
+            waveform = add_noise(waveform, ADD_NOISE)
         waveform = waveform[None, :]
 
         spec = np.squeeze(waveform)
@@ -138,7 +145,7 @@ class ECGDataset(Dataset):
 
             spec = np.expand_dims(spec, axis=0)
 
-        return waveform, torch.from_numpy(spec).type(torch.FloatTensor), idx
+        return waveform, torch.from_numpy(spec.copy()).type(torch.FloatTensor), idx
 
 
 def get_loaders(params):
