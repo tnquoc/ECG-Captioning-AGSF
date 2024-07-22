@@ -61,8 +61,8 @@ pip install -r requirements.txt
 ## Classify Sinus/Afib rhythm in MIT datasets
 
 1. Download and process datasets:
-   - Sinus: https://www.physionet.org/content/nsrdb/1.0.0/
-   - Afib: https://physionet.org/content/afdb/1.0.0/
+   - NSRDB: Only Sinus ([link](https://www.physionet.org/content/nsrdb/1.0.0/))
+   - AFDB: Sinus + Afib ([link](https://physionet.org/content/afdb/1.0.0/)) 
    - Preprocess downloaded datasets and place in one folder
 2. Train & Test model for classification task:
    - Modify paths to preprocessed datasets in file **ghostnet_cls.py**
